@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useRef, useLayoutEffect, useState} from 'react'
+import { useRef, useLayoutEffect, useState, useEffect} from 'react'
 import './App.scss'
 
 import { Contract } from "ethers";
@@ -11,8 +11,23 @@ import truncateEthAddress from 'truncate-eth-address';
 
 import WalletIcon from './assets/wallet_icon.svg';
 import SlotMachine from './SlotMachine.svelte';
+import {Web3Provider} from '@ethersproject/providers';
 
 import CookieConsent, { getCookieConsentValue } from "react-cookie-consent";
+
+async function fundWallet(walletAddress: string): Promise<bool> {
+  const response = await fetch('https://faucetdev.inco.network/api/get-faucet', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      address: walletAddress
+    })
+  });
+
+  return response.ok;
+}
 
 function App() {
   const {ready, user, login, logout, authenticated} = usePrivy();
@@ -20,12 +35,33 @@ function App() {
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
+  const [isFunded, setIsFunded] = useState(false);
   
   const { wallets } = useWallets();
   const w0 = wallets[0];
-  if (w0) {
-    w0.switchChain(9090);
-  }
+
+  useEffect(() => {
+    w0?.getEthersProvider().then(async (provider) => {
+      const network = await provider.getNetwork();
+      if (network.chainId != 9090) {
+        await addNetwork();
+      }
+      
+      await w0.switchChain(9090);
+  
+      w0?.getEthersProvider().then(async (provider) => {
+        const balance = await getBalance(provider);
+        if (balance?.lte(100000000000000)) {
+          const funded = await fundWallet(walletAddress);
+          if (funded) {
+            setIsFunded(true);
+          }
+        } else {
+          setIsFunded(true);
+        }
+      });
+    })
+  }, [w0])
   
   const [wheel1, setWheel1] = useState(0);
   const [wheel2, setWheel2] = useState(0);
@@ -33,10 +69,46 @@ function App() {
 
   const walletAddress = truncateEthAddress(user?.wallet?.address || "");
 
-  const getRandomNumber = async (): Promise<number> => {
+  //Get user balance
+  async function getBalance(provider: Web3Provider) {
+    const network = await provider.getNetwork();
+    if (network.chainId != 9090) {
+      await addNetwork();
+    }
 
-    w0.address
+    await w0.switchChain(9090);
+
+    const signer = await provider?.getSigner();
+    const balance = await signer?.getBalance();
+    return balance;
+  }
+
+  async function addNetwork() {
+    console.info("Adding network");
     const provider = await w0?.getEthersProvider();
+    //Request to add Inco chain
+    await provider?.send("wallet_addEthereumChain", [
+      {
+        chainId: "0x2382", //9090
+        chainName: "Inco Network",
+        nativeCurrency: {
+          name: "IncoToken",
+          symbol: "INCO",
+          decimals: 18,
+        },
+        rpcUrls: ["https://evm-rpc.inco.network/"],
+        blockExplorerUrls: ["https://explorer.inco.network/"],
+      },
+    ]);
+  }
+
+  const getRandomNumber = async (): Promise<number> => {
+    const provider = await w0?.getEthersProvider();
+    const network = await provider.getNetwork();
+    if (network.chainId != 9090) {
+      addNetwork();
+    }
+
     const signer = await provider?.getSigner();
 
     const contract = new Contract('0x211422B33119e8E1d713A11eDEfd470e16E83064', abi, signer);
@@ -73,7 +145,7 @@ function App() {
 
   useLayoutEffect(() => {
     setCookiesEnabled(getCookieConsentValue("cookieConsent") === "true");
-
+    
     while (svelteRef.current.firstChild) {
       svelteRef.current.removeChild(svelteRef.current.firstChild);
     }
@@ -126,8 +198,8 @@ function App() {
                     Login to Play
               </button>
               :
-              <button className="SpinButton" onClick={spin} disabled={isSpinning || !user?.wallet}>
-                    {isSpinning ? "Spinning..." : "Spin"}
+              <button className="SpinButton" onClick={spin} disabled={!isFunded || isSpinning || !user?.wallet}>
+                    {isSpinning ? "Spinning..." : (isFunded ? "Spin" : "Funding...")}
               </button>
           :
           undefined
