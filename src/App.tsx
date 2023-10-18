@@ -22,6 +22,10 @@ function App() {
   const [isStopping, setIsStopping] = useState(false);
   
   const { wallets } = useWallets();
+  const w0 = wallets[0];
+  if (w0) {
+    w0.switchChain(9090);
+  }
   
   const [wheel1, setWheel1] = useState(0);
   const [wheel2, setWheel2] = useState(0);
@@ -30,10 +34,6 @@ function App() {
   const walletAddress = truncateEthAddress(user?.wallet?.address || "");
 
   const getRandomNumber = async (): Promise<number> => {
-    const w0 = await wallets[0];
-    if (w0) {
-      w0.switchChain(9090);
-    }
 
     w0.address
     const provider = await w0?.getEthersProvider();
