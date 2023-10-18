@@ -44,7 +44,7 @@
     export let onSpin = () => {
     };
 
-    export let getRandomNumber = async () => {
+    export let getRandomNumber = async ( hook ) => {
         return 0;
     }
 
@@ -52,6 +52,7 @@
     }
 
     export let isSpinning = false;
+    export let isFetching = false;
     export let isStopping = false;
 
     $: if (isStopping) {
@@ -94,18 +95,20 @@
     let revealResult = false;
 
     
-    $: SPEED = isSpinning ? 2 : 0;
+    $: SPEED = isFetching ? 2 : 0;
     
-    //If isSpinning has changed to true, then start spinning
-    $: if (isSpinning) {
+    //If isFetching has changed to true, then start spinning
+    $: if (isFetching) {
         doSpin();
     }
 
     let doSpin = async () => {
         main_loop_interval = setInterval(() => {
-            col1Scroll += SPEED * col1Speed;
-            col2Scroll += SPEED * col2Speed;
-            col3Scroll += SPEED * col3Speed;
+            if (isSpinning) {
+                col1Scroll += SPEED * col1Speed;
+                col2Scroll += SPEED * col2Speed;
+                col3Scroll += SPEED * col3Speed;
+            }
 
             if (!revealResult) {
                 col1Scroll = col1Scroll % (col1Height / 11 * 8);
@@ -153,13 +156,16 @@
 
                     showOverlay = false;
                 }
-                isSpinning = false;
+                isFetching = false;
                 
             }
 
         }, 20);
 
-        let randomNumber = await getRandomNumber();
+        let randomNumber = await getRandomNumber( () => {
+            //Spin while waiting for block to be added
+            isSpinning = true;
+        });
         const c1 = randomNumber & 0b111;
         const c2 = (randomNumber >> 3) & 0b111;
         const c3 = (randomNumber >> 6) & 0b111;
@@ -245,7 +251,7 @@
         </div>
     </div>
     
-    {#if !isSpinning && revealResult && (col1FhashingID == col2FhashingID || col1FhashingID == col3FhashingID || col2FhashingID == col3FhashingID) }
+    {#if !isFetching && revealResult && (col1FhashingID == col2FhashingID || col1FhashingID == col3FhashingID || col2FhashingID == col3FhashingID) }
     <div class="Confetti">
     <Confetti size=30 colorArray={["url("+coin+")"]} x={[-5, 5]} y={[0, 0.1]} delay={[200, 3500]} duration=5000 amount=500 fallDistance="100vh" />
    </div>

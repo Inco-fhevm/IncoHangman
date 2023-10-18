@@ -34,7 +34,7 @@ function App() {
   const {ready, user, login, logout, authenticated} = usePrivy();
   const [isCookiesEnabled, setCookiesEnabled] = useState(false);
 
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const [isFunded, setIsFunded] = useState(false);
   
@@ -108,7 +108,8 @@ function App() {
     ]);
   }
 
-  const getRandomNumber = async (): Promise<number> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getRandomNumber = async ( hook : () => any ): Promise<number> => {
     const provider = await w0?.getEthersProvider();
     const network = await provider.getNetwork();
     if (network.chainId != 9090) {
@@ -119,6 +120,8 @@ function App() {
 
     const contract = new Contract('0x211422B33119e8E1d713A11eDEfd470e16E83064', abi, signer);
     const res = await contract.spin();
+
+    hook();
 
     const receipt = await res.wait();
     
@@ -134,12 +137,12 @@ function App() {
   }
 
   const spin = async () => {
-    setIsSpinning(true);
+    setIsFetching(true);
     setIsStopping(true);
   }
 
   const onSpinFinished = (c1: number, c2: number, c3: number) => {
-    setIsSpinning(false);
+    setIsFetching(false);
     setIsStopping(false);
     setWheel1(c1);
     setWheel2(c2);
@@ -161,7 +164,7 @@ function App() {
       props: {
         onSpin: spin,
         onSpinFinished: onSpinFinished,
-        isSpinning: isSpinning,
+        isFetching: isFetching,
         isStopping: isStopping,
         col1TargetID: wheel1,
         col2TargetID: wheel2,
@@ -169,7 +172,7 @@ function App() {
         getRandomNumber: getRandomNumber
       }
     })
-  }, [isSpinning, isStopping, wheel1, wheel2, wheel3])
+  }, [isFetching, isStopping, wheel1, wheel2, wheel3])
 
   return (
     <>
@@ -204,8 +207,8 @@ function App() {
                     Login to Play
               </button>
               :
-              <button className="SpinButton" onClick={spin} disabled={!isFunded || isSpinning || !user?.wallet}>
-                    {isSpinning ? "Spinning..." : (isFunded ? "Spin" : "Funding...")}
+              <button className="SpinButton" onClick={spin} disabled={!isFunded || isFetching || !user?.wallet}>
+                    {isFetching ? "Spinning..." : (isFunded ? "Spin" : "Funding...")}
               </button>
           :
           undefined
