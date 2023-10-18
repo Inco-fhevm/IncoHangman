@@ -51,7 +51,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         appId="clnkryb030404jr0f78yjv56n"
         onSuccess={handleLogin}
         config={{
-          loginMethods: ['wallet', 'email', 'google', 'discord', 'sms'],
+          loginMethods: ['wallet', 'sms', 'email', 'google', 'discord'],
           appearance: {
             theme: 'light',
             accentColor: '#676FFF',
