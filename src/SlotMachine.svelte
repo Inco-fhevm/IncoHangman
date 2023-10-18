@@ -55,7 +55,7 @@
     export let isFetching = false;
     export let isStopping = false;
 
-    $: if (isStopping) {
+    $: if (isSpinning) {
         setTimeout(() => {
             showOverlay = true;
         }, 3000);
