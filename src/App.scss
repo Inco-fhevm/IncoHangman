@@ -1,0 +1,131 @@
+#root {
+  max-width: 1280px;
+  min-width: 360px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  background-image: url("./assets/bg4.jpg");
+  background-size: cover;
+}
+
+body.dark {
+  background-image: url("./assets/bg4.jpg");
+  background-size: cover;
+}
+
+.card {
+  padding: 2em;
+}
+
+.Game {
+  /* margin: 0 auto; */
+  text-align: center;
+  height: 100vh;
+  display: contents;
+}
+
+.Fill {
+  background: white;
+  height: 100%;
+  width: 100%;
+}
+
+.LoginButton {
+  background: var(--tg-theme-button-color);
+  border-radius: 50;
+  color: var(--tg-theme-button-text-color)
+}
+
+.SignOutButton {
+  background:  var(--tg-theme-button-color);
+  border-radius: 1.5em;
+  min-width: 12em;
+  height: 3em;
+  color: var(--tg-theme-button-text-color)
+}
+
+.SpinButton {
+  background:  var(--tg-theme-button-color);
+  border-radius: 1.5em;
+  min-width: 12em;
+  height: 3em;
+  color: var(--tg-theme-button-text-color)
+}
+
+
+.SpinButton:disabled {
+  background: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-text-color);
+  border-radius: 1.5em;
+  min-width: 12em;
+  height: 3em;
+}
+
+.ActionButtons {
+  position: fixed;
+  bottom: 0;
+  background: var(--tg-theme-bg-color);
+  border-top-left-radius: 1.5em;
+  border-top-right-radius: 1.5em;
+  padding-top: 1em;
+  padding-bottom: 0.1em;
+  height: 12vh;
+  width: 100%;
+}
+
+.Profile {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  border-bottom-left-radius: 0.3em;
+  border-bottom-right-radius: 0.3em;
+  min-height: 3em;
+}
+
+.Profile .Wallet {
+  margin: 0;
+  padding: 0;
+  font-size: small;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.Profile .WalletIcon {
+  width: 24px;
+  height: 24px;
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+  margin-left: 0.4em;
+  margin-right: 0.4em;
+}
+
+.LogoutButton {
+  padding: 0;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  background: rgb(229, 106, 106);
+  height: 2em;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: 0.3em;
+  margin-right: 0.3em;
+  text-align: center;;
+}
+
+.CookieConsent {
+  color: var(--tg-theme-text-color);
+  font-size: small;
+}
+
+button:focus, button:active, button:visited{
+  outline: none;
+}
