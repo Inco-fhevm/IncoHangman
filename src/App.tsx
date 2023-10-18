@@ -15,8 +15,8 @@ import {Web3Provider} from '@ethersproject/providers';
 
 import CookieConsent, { getCookieConsentValue } from "react-cookie-consent";
 
-async function fundWallet(walletAddress: string): Promise<bool> {
-  const response = await fetch('https://faucetdev.inco.network/api/get-faucet', {
+async function fundWallet(walletAddress: string): Promise<boolean> {
+  const response = await fetch('https://faucet.inco.network/api/get-faucet', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
