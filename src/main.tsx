@@ -51,13 +51,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         appId="clnkryb030404jr0f78yjv56n"
         onSuccess={handleLogin}
         config={{
-          loginMethods: ['wallet'],
+          loginMethods: ['wallet', 'email', 'google', 'discord'],
           appearance: {
             theme: 'light',
             accentColor: '#676FFF',
             logo: 'https://your-logo-url',
           },
-          supportedChains: [incoChain]
+          supportedChains: [incoChain],
         }}>
   <React.StrictMode>
     <App />
