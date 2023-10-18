@@ -14,6 +14,7 @@ import SlotMachine from './SlotMachine.svelte';
 import {Web3Provider} from '@ethersproject/providers';
 
 import CookieConsent, { getCookieConsentValue } from "react-cookie-consent";
+import WebApp from '@twa-dev/sdk'
 
 async function fundWallet(walletAddress: string): Promise<boolean> {
   const response = await fetch('https://faucet.inco.network/api/get-faucet', {
@@ -52,9 +53,14 @@ function App() {
       w0?.getEthersProvider().then(async (provider) => {
         const balance = await getBalance(provider);
         if (balance?.lte(100000000000000)) {
-          const funded = await fundWallet(walletAddress);
+          const funded = await fundWallet(w0.address);
           if (funded) {
             setIsFunded(true);
+          } else {
+            WebApp.showPopup({
+              title: "Error",
+              message: "Could not fund wallet",
+            });
           }
         } else {
           setIsFunded(true);
