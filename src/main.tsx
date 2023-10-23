@@ -33,7 +33,7 @@ const incoChain: Chain = {
   },
 };
 
-import WebApp from '@twa-dev/sdk'
+import WebApp from '@twa-dev/sdk';
 
 import {PrivyProvider} from '@privy-io/react-auth';
 
@@ -45,13 +45,21 @@ const handleLogin = (user: any) => {
 WebApp.ready();
 //eruda.init();
 
+let loginMethods = ['sms', 'email', 'discord'];
+
+if (WebApp.platform === "weba" || WebApp.platform === "webk") {
+  loginMethods = ['google', ...loginMethods];
+}
+if (WebApp.platform !== "android" && WebApp.platform !== "ios") {
+  loginMethods = ['wallet', ...loginMethods];
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <PrivyProvider
         appId="clnkryb030404jr0f78yjv56n"
         onSuccess={handleLogin}
         config={{
-          loginMethods: ['wallet', 'sms', 'email', 'google', 'discord'],
+          loginMethods: loginMethods as ("sms" | "email" | "discord" | "wallet" | "google" | "twitter" | "github" | "linkedin" | "tiktok" | "apple")[],
           appearance: {
             theme: 'light',
             accentColor: '#676FFF',
