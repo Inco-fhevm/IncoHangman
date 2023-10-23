@@ -201,7 +201,7 @@ function App() {
 
         <div className="ActionButtons">
         {
-          ready && isCookiesEnabled?
+          ready?
               !authenticated ?
               <button className="LoginButton" onClick={login}>
                     Login to Play
