@@ -13,7 +13,6 @@ import WalletIcon from './assets/wallet_icon.svg';
 import SlotMachine from './SlotMachine.svelte';
 import {Web3Provider} from '@ethersproject/providers';
 
-import CookieConsent, { getCookieConsentValue } from "react-cookie-consent";
 import WebApp from '@twa-dev/sdk'
 
 async function fundWallet(walletAddress: string): Promise<boolean> {
@@ -32,7 +31,6 @@ async function fundWallet(walletAddress: string): Promise<boolean> {
 
 function App() {
   const {ready, user, login, logout, authenticated} = usePrivy();
-  const [isCookiesEnabled, setCookiesEnabled] = useState(false);
 
   const [isFetching, setIsFetching] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
@@ -153,8 +151,6 @@ function App() {
   const svelteRef = useRef<any>();
 
   useLayoutEffect(() => {
-    setCookiesEnabled(getCookieConsentValue("cookieConsent") === "true");
-    
     while (svelteRef.current.firstChild) {
       svelteRef.current.removeChild(svelteRef.current.firstChild);
     }
@@ -214,21 +210,6 @@ function App() {
           undefined
         }
         </div>
-
-        <CookieConsent
-          overlay
-          location="bottom"
-          buttonText="Accept"
-          cookieName="cookieConsent"
-          style={{ background: "var(--tg-theme-bg-color)", borderTopLeftRadius: "1.5em", borderTopRightRadius: "1.5em", }}
-          buttonStyle={{ background: "var(--tg-theme-button-color)", color: "var(--tg-theme-button-text-color)", fontSize: "13px" }}
-          expires={150}
-          onAccept={(_) => {
-            setCookiesEnabled(true);
-          }}
-        >
-          <div className="CookieConsent">This mini app uses cookies to enhance user experience.</div>
-        </CookieConsent>
       </div>
     </>
   )

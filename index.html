@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      if(!document.__defineGetter__) {
+      Object.defineProperty(document, 'cookie', {
+          get: function(){return ''},
+          set: function(){return true},
+      });
+      } else {
+          document.__defineGetter__("cookie", function() { return '';} );
+          document.__defineSetter__("cookie", function() {} );
+      }
+    </script>
     <title>Vite + React + TS</title>
   </head>
   <body>
