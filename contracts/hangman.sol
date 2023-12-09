@@ -16,6 +16,8 @@ contract Hangman {
     uint8 private constant MAX_LETTERS = 4;
     uint8 private constant QUESTIONMARK = 63;
 
+    bytes1[] private wrongGuesses;
+
     constructor () {
         lives = 11;
     }
@@ -25,7 +27,16 @@ contract Hangman {
         decryptedWord = new bytes(MAX_LETTERS);
 
         for (uint8 i = 0; i < MAX_LETTERS; i++){
-            encryptedCharsInv.push(TFHE.asEuint8(TFHE.shr(fourBytes, i*8)));
+            euint8 letter = TFHE.asEuint8(TFHE.shr(fourBytes, i*8));
+            //Make sure the letter is a valid a-z-A-Z character
+            ebool isLetter = TFHE.asEbool(TFHE.and(TFHE.asEuint8(TFHE.ge(letter, 65)), TFHE.asEuint8(TFHE.le(letter, 122))));
+            //If not uppercase -> make it uppercase
+            ebool isUpperCase = TFHE.asEbool(TFHE.and(TFHE.asEuint8(TFHE.ge(letter, 65)), TFHE.asEuint8(TFHE.le(letter, 90))));
+            euint8 uppercaseLetter = TFHE.cmux(isUpperCase, letter, TFHE.sub(letter, 32));
+
+            TFHE.optReq(isLetter);
+            
+            encryptedCharsInv.push(uppercaseLetter);
             decryptedWord[i] = bytes1(uint8(QUESTIONMARK));
         }
     }
@@ -35,8 +46,18 @@ contract Hangman {
 
         bool foundAtLeastOne = false;
         bytes memory asBytes = bytes(letter);
+        uint8 firstByte = uint8(asBytes[0]);
+
+        //Make sure the letter is a valid a-z-A-Z character
+        bool ifValidLetter = firstByte >= 65 && firstByte <= 122;
+        require(ifValidLetter);
+
+        //If not uppercase -> make it uppercase
+        bool ifUpperCase = firstByte >= 65 && firstByte <= 90;
+        firstByte = ifUpperCase ? firstByte : firstByte - 32;
+
         for (uint8 i = 0; i < encryptedCharsInv.length; i++) {
-            ebool possibleMatch = TFHE.eq(encryptedCharsInv[i] , uint8(asBytes[0]));
+            ebool possibleMatch = TFHE.eq(encryptedCharsInv[i] , firstByte);
             if (TFHE.decrypt(possibleMatch) == true) {
                 uint8 decryptedLetter = TFHE.decrypt(encryptedCharsInv[i]);
                 decryptedWord[decryptedWord.length-1 - i] = bytes1(decryptedLetter);
@@ -50,6 +71,8 @@ contract Hangman {
             if (nOfCellsRevealed >= encryptedCharsInv.length) {
                 setPlayerAsWinner();
             }
+        } else {
+            wrongGuesses.push(bytes1(firstByte));
         }
     }
 
