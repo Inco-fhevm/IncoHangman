@@ -8,12 +8,12 @@
 }
 
 body {
-  background-image: url("./assets/bg4.jpg");
+  background-image: url("./assets/bg4_dark.jpg");
   background-size: cover;
 }
 
 body.dark {
-  background-image: url("./assets/bg4.jpg");
+  background-image: url("./assets/bg4_dark.jpg");
   background-size: cover;
 }
 
@@ -46,23 +46,6 @@ body.dark {
   min-width: 12em;
   height: 3em;
   color: var(--tg-theme-button-text-color)
-}
-
-.SpinButton {
-  background:  var(--tg-theme-button-color);
-  border-radius: 1.5em;
-  min-width: 12em;
-  height: 3em;
-  color: var(--tg-theme-button-text-color)
-}
-
-
-.SpinButton:disabled {
-  background: var(--tg-theme-secondary-bg-color);
-  color: var(--tg-theme-text-color);
-  border-radius: 1.5em;
-  min-width: 12em;
-  height: 3em;
 }
 
 .ActionButtons {

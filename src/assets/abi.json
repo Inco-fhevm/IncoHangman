@@ -1,28 +1,72 @@
 [
 	{
-		"anonymous": false,
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "uint16",
-				"name": "number",
-				"type": "uint16"
+				"internalType": "string",
+				"name": "word",
+				"type": "string"
 			}
 		],
-		"name": "RandomNumber",
-		"type": "event"
+		"name": "guessEntireWord",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "letter",
+				"type": "string"
+			}
+		],
+		"name": "guessLetter",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [],
-		"name": "spin",
+		"name": "hasWon",
 		"outputs": [
 			{
-				"internalType": "uint16",
+				"internalType": "bool",
 				"name": "",
-				"type": "uint16"
+				"type": "bool"
 			}
 		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes",
+				"name": "inSecret",
+				"type": "bytes"
+			}
+		],
+		"name": "setWord",
+		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "showWord",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]

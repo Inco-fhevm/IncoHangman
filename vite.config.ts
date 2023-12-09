@@ -15,5 +15,5 @@ export default defineConfig({
   define: {
     'process.env': {}
   },
-  base: '/IncoSlots/'
+  base: '/IncoHangman/'
 })

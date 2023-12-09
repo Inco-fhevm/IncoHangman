@@ -56,7 +56,7 @@ if (WebApp.platform !== "android" && WebApp.platform !== "ios") {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <PrivyProvider
-        appId="clnkryb030404jr0f78yjv56n"
+        appId="clpyhx1kt00zhky0g7hyv24g1"
         onSuccess={handleLogin}
         config={{
           loginMethods: loginMethods as ("sms" | "email" | "discord" | "wallet" | "google" | "twitter" | "github" | "linkedin" | "tiktok" | "apple")[],

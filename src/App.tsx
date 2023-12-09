@@ -10,7 +10,7 @@ import {usePrivy, useWallets} from '@privy-io/react-auth';
 import truncateEthAddress from 'truncate-eth-address';
 
 import WalletIcon from './assets/wallet_icon.svg';
-import SlotMachine from './SlotMachine.svelte';
+import Game from './Game.svelte';
 import {Web3Provider} from '@ethersproject/providers';
 
 import WebApp from '@twa-dev/sdk'
@@ -32,8 +32,6 @@ async function fundWallet(walletAddress: string): Promise<boolean> {
 function App() {
   const {ready, user, login, logout, authenticated} = usePrivy();
 
-  const [isFetching, setIsFetching] = useState(false);
-  const [isStopping, setIsStopping] = useState(false);
   const [isFunded, setIsFunded] = useState(false);
   
   const { wallets } = useWallets();
@@ -67,9 +65,6 @@ function App() {
     })
   }, [w0])
   
-  const [wheel1, setWheel1] = useState(0);
-  const [wheel2, setWheel2] = useState(0);
-  const [wheel3, setWheel3] = useState(0);
 
   const walletAddress = truncateEthAddress(user?.wallet?.address || "");
 
@@ -134,18 +129,6 @@ function App() {
     */
   }
 
-  const spin = async () => {
-    setIsFetching(true);
-    setIsStopping(true);
-  }
-
-  const onSpinFinished = (c1: number, c2: number, c3: number) => {
-    setIsFetching(false);
-    setIsStopping(false);
-    setWheel1(c1);
-    setWheel2(c2);
-    setWheel3(c3);
-  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const svelteRef = useRef<any>();
@@ -155,20 +138,11 @@ function App() {
       svelteRef.current.removeChild(svelteRef.current.firstChild);
     }
     
-    new SlotMachine({
+    new Game({
       target: svelteRef.current as Element,
-      props: {
-        onSpin: spin,
-        onSpinFinished: onSpinFinished,
-        isFetching: isFetching,
-        isStopping: isStopping,
-        col1TargetID: wheel1,
-        col2TargetID: wheel2,
-        col3TargetID: wheel3,
-        getRandomNumber: getRandomNumber
-      }
+      props: {}
     })
-  }, [isFetching, isStopping, wheel1, wheel2, wheel3])
+  }, [])
 
   return (
     <>
@@ -203,9 +177,7 @@ function App() {
                     Login to Play
               </button>
               :
-              <button className="SpinButton" onClick={spin} disabled={!isFunded || isFetching || !user?.wallet}>
-                    {isFetching ? "Spinning..." : (isFunded ? "Spin" : "Funding...")}
-              </button>
+              undefined
           :
           undefined
         }
