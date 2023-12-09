@@ -10,10 +10,15 @@ import {usePrivy, useWallets} from '@privy-io/react-auth';
 import truncateEthAddress from 'truncate-eth-address';
 
 import WalletIcon from './assets/wallet_icon.svg';
+import MicIcon from './assets/mic_icon.svg';
+
 import Game from './Game.svelte';
 import {Web3Provider} from '@ethersproject/providers';
 
 import WebApp from '@twa-dev/sdk'
+
+import 'regenerator-runtime/runtime';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 async function fundWallet(walletAddress: string): Promise<boolean> {
   const response = await fetch('https://faucet.inco.network/api/get-faucet', {
@@ -29,6 +34,10 @@ async function fundWallet(walletAddress: string): Promise<boolean> {
   return response.ok;
 }
 
+const startListening = async () => {
+  await SpeechRecognition.startListening();
+}
+
 function App() {
   const {ready, user, login, logout, authenticated} = usePrivy();
 
@@ -36,6 +45,15 @@ function App() {
   
   const { wallets } = useWallets();
   const w0 = wallets[0];
+
+
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
+
 
   useEffect(() => {
     w0?.getEthersProvider().then(async (provider) => {
@@ -177,7 +195,9 @@ function App() {
                     Login to Play
               </button>
               :
-              undefined
+              <div>
+
+              </div>
           :
           undefined
         }
