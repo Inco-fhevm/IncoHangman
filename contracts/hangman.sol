@@ -17,7 +17,7 @@ contract Hangman {
     uint8 private constant QUESTIONMARK = 63;
 
     constructor () {
-        lives = 5;
+        lives = 11;
     }
 
     function setWord(bytes memory inSecret) public {
