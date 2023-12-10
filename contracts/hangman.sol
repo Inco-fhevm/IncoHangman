@@ -5,17 +5,23 @@ pragma solidity >=0.8.13 <0.8.20;
 import "fhevm/lib/TFHE.sol";
 
 contract HangmanFactory {
-    event GameCreated(address indexed player);
+    event GameCreated(address indexed player, address gameContract);
 
     address public master;
+    euint32 private fourBytes;
 
     constructor (address _master) {
         master = _master;
     }
 
-    function CreateGame(address player, bytes memory inSecret) public returns (address) {
+    function initialize(bytes memory inSecret) public onlyMaster {
+        fourBytes = TFHE.asEuint32(inSecret);
+    }
+
+    function CreateGame(address player) public returns (address) {
         HangmanGame game = new HangmanGame(player);
-        game.setWord(inSecret);
+        game.setWord(fourBytes);
+        emit GameCreated(player, address(this));
         return address(this);
     }
 
@@ -50,8 +56,7 @@ contract HangmanGame {
         player = _player;
     }
 
-    function setWord(bytes memory inSecret) public onlyFactory {
-        euint32 fourBytes = TFHE.asEuint32(inSecret);
+    function setWord(euint32 fourBytes) public onlyFactory {
         decryptedWord = new bytes(MAX_LETTERS);
 
         for (uint8 i = 0; i < MAX_LETTERS; i++){
