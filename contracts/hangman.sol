@@ -4,7 +4,28 @@ pragma solidity >=0.8.13 <0.8.20;
 
 import "fhevm/lib/TFHE.sol";
 
-contract Hangman { 
+contract HangmanFactory {
+    event GameCreated(address indexed player);
+
+    address public master;
+
+    constructor (address _master) {
+        master = _master;
+    }
+
+    function CreateGame(address player, bytes memory inSecret) public returns (address) {
+        HangmanGame game = new HangmanGame(player);
+        game.setWord(inSecret);
+        return address(this);
+    }
+
+    modifier onlyMaster() {
+        require(msg.sender == master);
+        _;
+    }
+}
+
+contract HangmanGame {
     euint8[] private encryptedCharsInv;
     bytes private decryptedWord;
 
@@ -17,12 +38,19 @@ contract Hangman {
     uint8 private constant QUESTIONMARK = 63;
 
     bytes1[] private wrongGuesses;
+    address private factory;
 
-    constructor () {
+    address public player;
+
+    event GuessedCorrectly(uint8 indexed letter);
+
+    constructor (address _player) {
         lives = 11;
+        factory = msg.sender;
+        player = _player;
     }
 
-    function setWord(bytes memory inSecret) public {
+    function setWord(bytes memory inSecret) public onlyFactory {
         euint32 fourBytes = TFHE.asEuint32(inSecret);
         decryptedWord = new bytes(MAX_LETTERS);
 
@@ -41,7 +69,7 @@ contract Hangman {
         }
     }
 
-    function guessLetter(string memory letter) public {
+    function guessLetter(string memory letter) public onlyPlayer {
         require(lives > 0);
 
         bool foundAtLeastOne = false;
@@ -67,11 +95,12 @@ contract Hangman {
         }
 
         if (foundAtLeastOne) {
-            lives = lives - 1;
             if (nOfCellsRevealed >= encryptedCharsInv.length) {
                 setPlayerAsWinner();
             }
+            emit GuessedCorrectly(firstByte);
         } else {
+            lives = lives - 1;
             wrongGuesses.push(bytes1(firstByte));
         }
     }
@@ -80,7 +109,7 @@ contract Hangman {
         playerWon = true;
     }
 
-    function guessEntireWord(string memory word) public {
+    function guessEntireWord(string memory word) public onlyPlayer {
         require(lives > 0);
         require(bytes(word).length == encryptedCharsInv.length);
 
@@ -104,5 +133,15 @@ contract Hangman {
 
     function hasWon() public view returns (bool) {
         return playerWon;
+    }
+
+    modifier onlyFactory() {
+        require(msg.sender == factory);
+        _;
+    }
+
+    modifier onlyPlayer() {
+        require(msg.sender == player);
+        _;
     }
 }
