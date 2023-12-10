@@ -15,7 +15,7 @@
     "@twa-dev/sdk": "^6.9.0",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "@wagmi/chains": "^1.8.0",
-    "ethers": "^5.7.2",
+    "ethers": "5.6.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-speech-recognition": "^3.10.0",
@@ -41,5 +41,8 @@
     "svelte-reactive-preprocessor": "^0.8.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
+  },
+  "resolutions": {
+    "**/ethers": "5.6.1"
   }
 }

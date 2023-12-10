@@ -40,6 +40,12 @@ body.dark {
   color: var(--tg-theme-button-text-color)
 }
 
+.CreateButton {
+  background: var(--tg-theme-button-color);
+  border-radius: 50;
+  color: var(--tg-theme-button-text-color)
+}
+
 .SignOutButton {
   background:  var(--tg-theme-button-color);
   border-radius: 1.5em;

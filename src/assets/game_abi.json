@@ -1,8 +1,40 @@
 [
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_player",
+				"type": "address"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "string",
+				"name": "letter",
+				"type": "string"
+			}
+		],
+		"name": "GuessedCorrectly",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "string",
+				"name": "letter",
+				"type": "string"
+			}
+		],
+		"name": "GuessedIncorrectly",
+		"type": "event"
 	},
 	{
 		"inputs": [
@@ -44,16 +76,42 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "player",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
-				"internalType": "bytes",
-				"name": "inSecret",
-				"type": "bytes"
+				"internalType": "euint32",
+				"name": "fourBytes",
+				"type": "uint256"
 			}
 		],
 		"name": "setWord",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "showMisses",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{

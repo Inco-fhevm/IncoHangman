@@ -43,12 +43,13 @@ contract HangmanGame {
     uint8 private constant MAX_LETTERS = 4;
     uint8 private constant QUESTIONMARK = 63;
 
-    bytes1[] private wrongGuesses;
+    bytes private wrongGuesses;
     address private factory;
 
     address public player;
 
-    event GuessedCorrectly(uint8 indexed letter);
+    event GuessedCorrectly(string indexed letter);
+    event GuessedIncorrectly(string indexed letter);
 
     constructor (address _player) {
         lives = 11;
@@ -103,10 +104,11 @@ contract HangmanGame {
             if (nOfCellsRevealed >= encryptedCharsInv.length) {
                 setPlayerAsWinner();
             }
-            emit GuessedCorrectly(firstByte);
+            emit GuessedCorrectly(letter);
         } else {
             lives = lives - 1;
-            wrongGuesses.push(bytes1(firstByte));
+            wrongGuesses = bytes.concat(wrongGuesses, bytes1(firstByte));
+            emit GuessedIncorrectly(letter);
         }
     }
 
@@ -134,6 +136,10 @@ contract HangmanGame {
 
     function showWord() public view returns (string memory) {
         return string(decryptedWord);
+    }
+
+    function showMisses() public view returns (string memory) {
+        return string(wrongGuesses);
     }
 
     function hasWon() public view returns (bool) {
