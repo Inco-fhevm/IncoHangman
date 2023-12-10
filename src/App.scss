@@ -101,12 +101,49 @@ body.dark {
   margin-bottom: auto;
   margin-left: 0.3em;
   margin-right: 0.3em;
-  text-align: center;;
+  text-align: center;
 }
 
 .CookieConsent {
   color: var(--tg-theme-text-color);
   font-size: small;
+}
+
+.LetterCarusel {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.LetterInput {
+  width: 3em;
+  min-width: 0.5em;
+  height: 100%;
+  border: none;
+  margin-left: 0.4em;
+  margin-right: 0.4em;
+  background: transparent;
+  text-align: center;
+  font-family: "SketchScript";
+  font-size: xx-large;
+  color: var(--tg-theme-text-color);
+}
+
+.LetterInputForm {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.Letter {
+  font-family: "SketchScript";
+  font-size: xx-large;
+  color: var(--tg-theme-text-color);
 }
 
 button:focus, button:active, button:visited{

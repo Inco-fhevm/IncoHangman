@@ -38,21 +38,35 @@ const startListening = async () => {
   await SpeechRecognition.startListening();
 }
 
+const guess = async () => {
+  console.info("Guessing");
+}
+
 function App() {
   const {ready, user, login, logout, authenticated} = usePrivy();
 
   const [isFunded, setIsFunded] = useState(false);
+
+  const [letter, setLetter] = useState("");
+
+  const handleLetterInput = (e) => {
+    // Here we are checking if the length is equal to 10
+    if (e.target.value.length == 1 || e.target.value.length == 4) {
+      setLetter(e.target.value);
+    }
+};
   
   const { wallets } = useWallets();
   const w0 = wallets[0];
 
-
+  /*
   const {
     transcript,
     listening,
     resetTranscript,
     browserSupportsSpeechRecognition
   } = useSpeechRecognition();
+  */
 
 
   useEffect(() => {
@@ -195,8 +209,20 @@ function App() {
                     Login to Play
               </button>
               :
-              <div>
-
+              
+              <div> {/* <div className="LetterCarusel">
+                  {/*
+                  {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter, index) => {
+                    return <p className="Letter" key={index}>{letter}</p>;
+                  })}
+                </div> */}
+                <div className="LetterInputForm">
+                  
+                  <input className="LetterInput" type="text" maxLength={4} placeholder="A - Z" value={letter} onChange={handleLetterInput}></input>
+                  <button className="LoginButton" onClick={guess}>
+                      Guess
+                  </button>
+                </div>
               </div>
           :
           undefined

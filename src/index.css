@@ -60,3 +60,10 @@ button {
     background-color: #f9f9f9;
   }
 }
+
+@font-face {
+  font-family: 'SketchScript';
+  src: url('SketchScript-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
