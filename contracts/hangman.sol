@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause-Clear
 
-pragma solidity >=0.8.13 <0.8.20;
+pragma solidity >=0.8.13 <=0.8.20;
 
 import "fhevm/lib/TFHE.sol";
 
@@ -8,21 +8,29 @@ contract HangmanFactory {
     event GameCreated(address indexed player, address gameContract);
 
     address public master;
-    euint32 private fourBytes;
+    euint32[] private fourBytes;
+    uint256 public currentWord;
 
     constructor (address _master) {
         master = _master;
     }
 
-    function initialize(bytes memory inSecret) public onlyMaster {
-        fourBytes = TFHE.asEuint32(inSecret);
+    function getWordsTotal() public view returns(uint256) {
+        return fourBytes.length;
+    }
+
+    function addWord(bytes memory inSecret) public onlyMaster {
+        fourBytes.push(TFHE.asEuint32(inSecret));
     }
 
     function CreateGame(address player) public returns (address) {
-        HangmanGame game = new HangmanGame(player);
-        game.setWord(fourBytes);
-        emit GameCreated(player, address(this));
-        return address(this);
+        require(currentWord < fourBytes.length, "no words left");
+
+        HangmanGame game = new HangmanGame(player, currentWord);
+        game.setWord(fourBytes[currentWord]);
+        currentWord++;
+        emit GameCreated(player, address(game));
+        return address(game);
     }
 
     modifier onlyMaster() {
@@ -32,7 +40,7 @@ contract HangmanFactory {
 }
 
 contract HangmanGame {
-    euint8[] private encryptedCharsInv;
+    euint8[4] private encryptedCharsInv;
     bytes private decryptedWord;
 
     bool private luckyGuess;
@@ -42,19 +50,22 @@ contract HangmanGame {
 
     uint8 private constant MAX_LETTERS = 4;
     uint8 private constant QUESTIONMARK = 63;
+    uint8 private constant UNDERSCORE = 95;
 
     bytes private wrongGuesses;
     address private factory;
 
     address public player;
+    uint256 public gameID;
 
     event GuessedCorrectly(string indexed letter);
     event GuessedIncorrectly(string indexed letter);
 
-    constructor (address _player) {
+    constructor (address _player, uint256 _gameID) {
         lives = 11;
         factory = msg.sender;
         player = _player;
+        gameID = _gameID;
     }
 
     function setWord(euint32 fourBytes) public onlyFactory {
@@ -70,8 +81,9 @@ contract HangmanGame {
 
             TFHE.optReq(isLetter);
             
-            encryptedCharsInv.push(uppercaseLetter);
-            decryptedWord[i] = bytes1(uint8(QUESTIONMARK));
+            //encryptedCharsInv.push(uppercaseLetter);
+            encryptedCharsInv[i] = uppercaseLetter;
+            decryptedWord[i] = bytes1(uint8(UNDERSCORE));
         }
     }
 

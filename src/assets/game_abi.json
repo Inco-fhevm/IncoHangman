@@ -5,6 +5,11 @@
 				"internalType": "address",
 				"name": "_player",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_gameID",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -35,6 +40,19 @@
 		],
 		"name": "GuessedIncorrectly",
 		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "gameID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	},
 	{
 		"inputs": [

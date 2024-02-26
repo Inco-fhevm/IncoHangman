@@ -11,7 +11,6 @@ import {usePrivy, useWallets} from '@privy-io/react-auth';
 import truncateEthAddress from 'truncate-eth-address';
 
 import WalletIcon from './assets/wallet_icon.svg';
-import MicIcon from './assets/mic_icon.svg';
 
 import Game from './Game.svelte';
 import {Web3Provider} from '@ethersproject/providers';
@@ -19,11 +18,11 @@ import {Web3Provider} from '@ethersproject/providers';
 import WebApp from '@twa-dev/sdk'
 
 import 'regenerator-runtime/runtime';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import { lineaTestnet } from '@wagmi/chains';
+
+const GAME_FACTORY_ADDR = "0x746eD964A6B0ECF7Ab765Dfd831Bf4a715Ac33af";
 
 async function fundWallet(walletAddress: string): Promise<boolean> {
-  const response = await fetch('https://faucet.inco.network/api/get-faucet', {
+  const response = await fetch('https://faucet.testnet.inco.org/api/get-faucet', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -36,10 +35,6 @@ async function fundWallet(walletAddress: string): Promise<boolean> {
   return response.ok;
 }
 
-const startListening = async () => {
-  await SpeechRecognition.startListening();
-}
-
 
 function App() {
   const {ready, user, login, logout, authenticated} = usePrivy();
@@ -49,6 +44,10 @@ function App() {
 
   const [letter, setLetter] = useState("");
   const [gameAddress, setGameAddress] = useState("");
+  const [wordReveal, setWordReveal] = useState("____");
+  const [nOfLives, setNOfLives] = useState(11);
+  const [hasWon, setHasWon] = useState(false);
+  const [wrongGuesses, setWrongGuesses] = useState<Array<string>>([]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleLetterInput = (e: any) => {
@@ -56,7 +55,13 @@ function App() {
     if (e.target.value.length == 1 || e.target.value.length == 4) {
       setLetter(e.target.value);
     }
-};
+  };
+
+  const handleOnKeyDown = (e: React.KeyboardEvent) => {
+    if (e.keyCode === 8) {
+      setLetter("");
+    }
+  };
   
   const { wallets } = useWallets();
   const w0 = wallets[0];
@@ -82,7 +87,7 @@ function App() {
   
       w0?.getEthersProvider().then(async (provider) => {
         const balance = await getBalance(provider);
-        if (balance?.lte(100000000000000)) {
+        if (!isFunded && balance?.lte(100000000000000)) {
           const funded = await fundWallet(w0.address);
           if (funded) {
             setIsFunded(true);
@@ -123,14 +128,14 @@ function App() {
     await provider?.send("wallet_addEthereumChain", [
       {
         chainId: "0x2382", //9090
-        chainName: "Inco Network",
+        chainName: "Inco Gentry",
         nativeCurrency: {
           name: "IncoToken",
           symbol: "INCO",
           decimals: 18,
         },
-        rpcUrls: ["https://evm-rpc.inco.network/"],
-        blockExplorerUrls: ["https://explorer.inco.network/"],
+        rpcUrls: ["https://testnet.inco.org/"],
+        blockExplorerUrls: ["https://explorer.inco.org/"],
       },
     ]);
   }
@@ -140,18 +145,39 @@ function App() {
     const gameAddr = await createNewGame(() => setIsInGame(true));
     setGameAddress(gameAddr);
     setIsInGame(true);
+
+    //Reset state
+    setLetter("");
+    setWordReveal("____");
+    setNOfLives(11);
+    setHasWon(false);
+    setWrongGuesses([]);
     console.info("Game created");
     console.info(gameAddr);
-
-    const res = await showWord(gameAddr);
   }
 
 
   const guess = async () => {
     console.info("Making a guess");
-    const res = await guessLetter(letter, () => {});
-    console.info("Guess made");
-    console.info(res);
+    const correctGuess = await guessLetter(letter, () => {
+      setLetter("");
+    });
+    console.info("Guessed correctly?:");
+    console.info(correctGuess);
+    if (correctGuess) {
+      const revealedWord = await showWord();
+      console.info("Word:");
+      console.info(revealedWord);
+      setWordReveal(revealedWord);
+      //Search revealed word for underscores
+      if (revealedWord.indexOf("_") === -1) {
+        setHasWon(true);
+      }
+    } else {
+      console.info("Updating wrong guess list:")
+      setWrongGuesses(wrongGuesses.concat([letter]));
+      console.info(wrongGuesses);
+    }
   }
 
 
@@ -164,10 +190,9 @@ function App() {
     }
 
     const signer = await provider?.getSigner();
-    //signed address
     const address = await signer?.getAddress();
 
-    const factoryContract = new Contract('0x53403B0Bc452A5Fb8A890479077360611D623544', factoryABI, signer);
+    const factoryContract = new Contract(GAME_FACTORY_ADDR, factoryABI, signer);
     const res = await factoryContract.CreateGame(address);
 
     hook();
@@ -176,13 +201,14 @@ function App() {
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const event = receipt.events.find((event: any) => event.event === 'GameCreated');
-    const [playerAddr, gameAddr] = event.args;   
+    const [playerAddr, gameAddr] = event.args; 
+    console.info("playerAddr:", playerAddr);  
     return gameAddr;
   }
 
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const guessLetter = async ( letter: string, hook : () => any ): Promise<string> => {
+  const guessLetter = async ( letter: string, hook : () => any ): Promise<boolean> => {
     const provider = await w0?.getEthersProvider();
     const network = await provider.getNetwork();
     if (network.chainId != 9090) {
@@ -190,40 +216,55 @@ function App() {
     }
 
     const signer = await provider?.getSigner();
-    //signed address
-    const address = await signer?.getAddress();
 
     const gameContract = new Contract(gameAddress, gameABI, signer);
 
     console.info("Before estimate gas")
     //const gasEstimated = await gameContract.estimateGas.guessLetter(letter);
 
-    const res = await gameContract.guessLetter(letter, {
-      gasLimit: 30000000
-    });
+    const res = await gameContract.guessLetter(letter/*, {
+      gasLimit: 300000000
+    }*/);
 
     hook();
 
     const receipt = await res.wait();
     
+    /*
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const event = receipt.events.find((event: any) => event.event === 'GuessedCorrectly' || event.event === 'GuessedIncorrectly');
     if (event) {
+      console.info("Guessed event:");
+      console.info(event);
       const [retLetter] = event.args;   
       return retLetter;
     }
-    return letter;
+    */
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const guessedCorrectlyEvent = receipt.events.find((event: any) => event.event === 'GuessedCorrectly');
+    if (guessedCorrectlyEvent) {
+      console.info("Guessed correctly!!");
+      const [correctLetter] = guessedCorrectlyEvent.args;
+      console.info("correctLetter:");
+      console.info(correctLetter);
+      return true;
+    }
+    else {
+      if (nOfLives > 0) {
+        setNOfLives(nOfLives - 1);
+      }
+      return false;
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const showWord = async (gameAddress: string): Promise<string> => {
+  const showWord = async (): Promise<string> => {
     const provider = await w0?.getEthersProvider();
     const network = await provider.getNetwork();
     if (network.chainId != 9090) {
       addNetwork();
     }
-
-    const signer = await provider?.getSigner();
 
     const gameContract = new Contract(gameAddress, gameABI, provider);
 
@@ -241,9 +282,14 @@ function App() {
     
     new Game({
       target: svelteRef.current as Element,
-      props: {}
+      props: {
+        wrongGuesses: [...wrongGuesses],
+        lives: nOfLives,
+        currentWord: wordReveal,
+        hasWon: hasWon
+      }
     })
-  }, [])
+  }, [nOfLives, wordReveal, wrongGuesses, hasWon])
 
   return (
     <>
@@ -279,24 +325,18 @@ function App() {
               </button>
               :
               
-              <div> {/* <div className="LetterCarusel">
-                  {/*
-                  {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter, index) => {
-                    return <p className="Letter" key={index}>{letter}</p>;
-                  })}
-                </div> */
-
-                isInGame ?
+              <div> {
+                isInGame && nOfLives > 0 && !hasWon ?
                 <div className="LetterInputForm">
                   
-                  <input className="LetterInput" type="text" maxLength={4} placeholder="A - Z" value={letter} onChange={handleLetterInput}></input>
+                  <input className="LetterInput" type="text" maxLength={4} placeholder="A - Z" value={letter} onChange={handleLetterInput} onKeyDown={handleOnKeyDown}></input>
                   <button className="LoginButton" onClick={guess}>
-                      Guess
+                      Guess {nOfLives}
                   </button>
                 </div>
                 :
                 <button className="CreateButton" onClick={createGame}>
-                      CreateGame
+                      New Game
                 </button>
                 }
               </div>

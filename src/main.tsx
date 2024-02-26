@@ -19,16 +19,16 @@ const incoChain: Chain = {
   },
  rpcUrls: {
      default: {
-         http: ["https://evm-rpc.inco.network/"],
+         http: ["https://testnet.inco.org/"],
       },
      public: {
-         http: ["https://evm-rpc.inco.network/"],
+         http: ["https://testnet.inco.org/"],
       },
   },
  blockExplorers: {
      default: {
          name: "Explorer",
-         url: "https://explorer.inco.network/",
+         url: "https://explorer.inco.org/",
       },
   },
 };
