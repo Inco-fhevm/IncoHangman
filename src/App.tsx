@@ -103,7 +103,7 @@ function App() {
         }
       });
     })
-  }, [w0, authenticated])
+  }, [w0])
   
 
   const walletAddress = truncateEthAddress(user?.wallet?.address || "");
