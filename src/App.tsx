@@ -22,6 +22,7 @@ import 'regenerator-runtime/runtime';
 const GAME_FACTORY_ADDR = "0x746eD964A6B0ECF7Ab765Dfd831Bf4a715Ac33af";
 
 async function fundWallet(walletAddress: string): Promise<boolean> {
+  console.info("Funding wallet");
   const response = await fetch('https://faucet.testnet.inco.org/api/get-faucet', {
     method: 'POST',
     headers: {
@@ -102,7 +103,7 @@ function App() {
         }
       });
     })
-  }, [w0])
+  }, [w0, authenticated])
   
 
   const walletAddress = truncateEthAddress(user?.wallet?.address || "");
