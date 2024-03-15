@@ -19,7 +19,7 @@ import WebApp from '@twa-dev/sdk'
 
 import 'regenerator-runtime/runtime';
 
-const GAME_FACTORY_ADDR = "0x746eD964A6B0ECF7Ab765Dfd831Bf4a715Ac33af";
+const GAME_FACTORY_ADDR = "0x50FF19187e7e407fb969F6CDe366baf3be122D97";
 
 async function fundWallet(walletAddress: string): Promise<boolean> {
   console.info("Funding wallet");

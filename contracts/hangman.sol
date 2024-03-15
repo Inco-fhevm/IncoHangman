@@ -24,10 +24,12 @@ contract HangmanFactory {
     }
 
     function CreateGame(address player) public returns (address) {
-        require(currentWord < fourBytes.length, "no words left");
-
         HangmanGame game = new HangmanGame(player, currentWord);
-        game.setWord(fourBytes[currentWord]);
+        if (currentWord < fourBytes.length) {
+            game.setWord(fourBytes[currentWord]);
+        } else {
+            game.setWord(fourBytes[0]);
+        }
         currentWord++;
         emit GameCreated(player, address(game));
         return address(game);
