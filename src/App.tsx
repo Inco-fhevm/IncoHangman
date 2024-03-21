@@ -23,7 +23,7 @@ const GAME_FACTORY_ADDR = "0x50FF19187e7e407fb969F6CDe366baf3be122D97";
 
 async function fundWallet(walletAddress: string): Promise<boolean> {
   console.info("Funding wallet");
-  const response = await fetch('https://faucet.testnet.inco.org/api/get-faucet', {
+  const response = await fetch('https://faucetdev.testnet.inco.org/api/get-faucet', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
