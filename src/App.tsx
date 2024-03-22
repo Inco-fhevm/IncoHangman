@@ -15,8 +15,6 @@ import WalletIcon from './assets/wallet_icon.svg';
 import Game from './Game.svelte';
 import {Web3Provider} from '@ethersproject/providers';
 
-import WebApp from '@twa-dev/sdk'
-
 import 'regenerator-runtime/runtime';
 
 const GAME_FACTORY_ADDR = "0x50FF19187e7e407fb969F6CDe366baf3be122D97";
@@ -89,7 +87,8 @@ function App() {
       w0?.getEthersProvider().then(async (provider) => {
         const balance = await getBalance(provider);
         if (!isFunded && balance?.lte(100000000000000)) {
-          const funded = await fundWallet(w0.address);
+          await fundWallet(w0.address);
+          /*
           if (funded) {
             setIsFunded(true);
           } else {
@@ -98,9 +97,9 @@ function App() {
               message: "Could not fund wallet",
             });
           }
-        } else {
-          setIsFunded(true);
+          */
         }
+        setIsFunded(true);
       });
     })
   }, [w0])
