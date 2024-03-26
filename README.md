@@ -8,8 +8,8 @@ Written with React + Svelte.
 # Dependencies
 The project uses the following dependencies:
 
-- @privy-io/react-auth for the Privy overlay
-- @twa-dev/sdk for Telegram Web API
+- [@privy-io/react-auth](https://www.npmjs.com/package/@privy-io/react-auth) for the Privy overlay
+- [@twa-dev/sdk](https://www.npmjs.com/package/@twa-dev/sdk) for Telegram Web API
 
 # How it works
 The game is written using two frameworks:
